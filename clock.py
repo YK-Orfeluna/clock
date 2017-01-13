@@ -75,9 +75,9 @@ frame.fill(255)
 cv2.circle(frame, (300, 300), RAD, BLACK, thickness=RAD*2)
 
 for i in xrange(60) :
-	cv2.line(frame, minute(0, i, 0, r=200), minute(0, i, 0), BLUE, thickness=3)
+	cv2.line(frame, minute(0, i, 0, r=200), minute(0, i, 0), BLUE, 3, cv2.CV_AA)
 for i in xrange(12) :
-	cv2.line(frame, hour(i, 0, 0, r=200), hour(i, 0, 0), RED, thickness=5)
+	cv2.line(frame, hour(i, 0, 0, r=200), hour(i, 0, 0), RED, 5, cv2.CV_AA)
 
 while True :
 	clock = frame.copy()
