@@ -72,7 +72,7 @@ def time_text(h, m, s) :
 frame = np.zeros([HEIGHT, WIDTH, CHANNEL])
 frame.fill(255)
 
-cv2.circle(frame, (300, 300), RAD, BLACK, thickness=RAD*2)
+cv2.circle(frame, (300, 300), RAD, BLACK, -1, cv2.CV_AA)
 
 for i in xrange(60) :
 	cv2.line(frame, minute(0, i, 0, r=200), minute(0, i, 0), BLUE, 3, cv2.CV_AA)
