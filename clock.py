@@ -12,6 +12,9 @@ CENTER = (300, 300)				# center of clock
 
 RAD = 5							# radians of circle
 
+RAD_OUT = 250
+RAD_IN = 200
+
 BLACK = (0, 0, 0)				# color(BGR)
 RED = (0, 0, 255)
 GREEN = (0, 255, 0)
@@ -20,86 +23,101 @@ YELLOW = (0, 255, 255)
 MAGENTA = (255, 0, 255)
 CYAN = (255, 255, 0)
 
-def hour(h, m, s, r=250) :		# clock needle of hour(hour, minute, second, rad)
-	global CENTER
-	hour = h % 12 - 3
-	theta = 360 / 12 * hour + (m * 60 + s) / 120.0
-	x = r * math.cos(math.radians(theta)) + CENTER[0]
-	x = int(round(x, 0))
-	y = r * math.sin(math.radians(theta)) + CENTER[0]
-	y = int(round(y, 0))
-	return (x, y)
+EDGE = cv2.CV_AA
 
-def minute(h, m, s ,r=250) :	# clock needle of minute(hour, minute, second, rad)
-	global CENTER
-	minute = m % 60 + 45
-	theta = 360 / 60 * minute + (s * 0.1)
-	x = r * math.cos(math.radians(theta)) + CENTER[0]
-	x = int(round(x, 0))
-	y = r * math.sin(math.radians(theta)) + CENTER[0]
-	y = int(round(y, 0))
-	return (x, y)
+WINDOW = "Clock"
 
-def second(h, m, s ,r=250) :	# clock needle of second(hour, minute, second, rad)
-	global CENTER
-	second = s % 60 + 45
-	theta = 360 / 60 * second
-	x = r * math.cos(math.radians(theta)) + CENTER[0]
-	x = int(round(x, 0))
-	y = r * math.sin(math.radians(theta)) + CENTER[0]
-	y = int(round(y, 0))
-	return (x, y)
+class Clock() :
+	def __init__(self) :
+		self.frame = np.zeros([HEIGHT, WIDTH, CHANNEL])
+		self.frame.fill(255)
+		self.h = 0
+		self.m = 0
+		self.s = 0
 
-def time_text(h, m, s) :
-	if h <= 10 :
-		h = "0" + str(h)
-	else :
-		h = str(h)
+	def hour(self, r) :		# clock needle of hour(hour, minute, second, rad)
+		hour = self.h % 12 - 3
+		theta = 360 / 12 * hour + (self.m * 60 + self.s) / 120.0
+		x = r * math.cos(math.radians(theta)) + CENTER[0]
+		x = int(round(x, 0))
+		y = r * math.sin(math.radians(theta)) + CENTER[0]
+		y = int(round(y, 0))
+		return (x, y)
 
-	if m <= 10 :
-		m = "0" + str(m)
-	else :
-		m = str(m)
+	def minute(self, r) :	# clock needle of minute(hour, minute, second, rad)
+		minute = self.m % 60 + 45
+		theta = 360 / 60 * minute + (self.s * 0.1)
+		x = r * math.cos(math.radians(theta)) + CENTER[0]
+		x = int(round(x, 0))
+		y = r * math.sin(math.radians(theta)) + CENTER[0]
+		y = int(round(y, 0))
+		return (x, y)
 
-	if s <= 10 :
-		s = "0" + str(s)
-	else :
-		s = str(s)
+	def second(self, r) :	# clock needle of second(hour, minute, second, rad)
+		second = self.s % 60 + 45
+		theta = 360 / 60 * second
+		x = r * math.cos(math.radians(theta)) + CENTER[0]
+		x = int(round(x, 0))
+		y = r * math.sin(math.radians(theta)) + CENTER[0]
+		y = int(round(y, 0))
+		return (x, y)
 
-	nowtime = h + " : " + m + " : " + s
-	return nowtime
+	def time_text(self) :
+		if self.h <= 10 :
+			h = "0" + str(self.h)
+		else :
+			h = str(self.h)
 
-frame = np.zeros([HEIGHT, WIDTH, CHANNEL])
-frame.fill(255)
+		if self.m <= 10 :
+			m = "0" + str(self.m)
+		else :
+			m = str(self.m)
 
-cv2.circle(frame, (300, 300), RAD, BLACK, -1, cv2.CV_AA)
+		if self.s <= 10 :
+			s = "0" + str(self.s)
+		else :
+			s = str(self.s)
 
-for i in xrange(60) :
-	cv2.line(frame, minute(0, i, 0, r=200), minute(0, i, 0), BLUE, 3, cv2.CV_AA)
-for i in xrange(12) :
-	cv2.line(frame, hour(i, 0, 0, r=200), hour(i, 0, 0), RED, 5, cv2.CV_AA)
+		nowtime = h + " : " + m + " : " + s
+		return nowtime
 
-while True :
-	clock = frame.copy()
+	def background(self) :
+		cv2.circle(self.frame, (300, 300), RAD, BLACK, -1, EDGE)
 
-	t = time.localtime()
+		for i in xrange(60) :
+			self.m = i
+			cv2.line(self.frame, self.minute(RAD_IN), self.minute(RAD_OUT), BLUE, 3, EDGE)
+		self.m = 0
+		for i in xrange(12) :
+			self.h = i
+			cv2.line(self.frame, self.hour(RAD_IN), self.hour(RAD_OUT), RED, 5, EDGE)
 
-	h = t.tm_hour
-	m = t.tm_min
-	s = t.tm_sec
+	def main(self) :
+		self.background()
 
-	cv2.line(clock, CENTER, hour(h, m, s, r=150), BLACK, 10, cv2.CV_AA)
-	cv2.line(clock, CENTER, minute(h, m, s, r = 200), BLACK, 5, cv2.CV_AA)
-	cv2.line(clock, CENTER, second(h, m, s), BLACK, 2, cv2.CV_AA)
+		while True :
+			clock = self.frame.copy()
 
-	nowtime = time_text(h, m, s)
-	cv2.putText(clock, nowtime, (150, 650), cv2.FONT_HERSHEY_PLAIN, 3, BLACK, 3, cv2.CV_AA)
+			t = time.localtime()
 
-	cv2.imshow("clock", clock)	
-	
-	key = cv2.waitKey(100)
-	if key != -1 :
-		break
+			self.h = t.tm_hour
+			self.m = t.tm_min
+			self.s = t.tm_sec
 
-cv2.destroyWindow("clock")
-exit()
+			cv2.line(clock, CENTER, self.hour(150), BLACK, 10, EDGE)
+			cv2.line(clock, CENTER, self.minute(RAD_IN), BLACK, 5, EDGE)
+			cv2.line(clock, CENTER, self.second(RAD_OUT), BLACK, 2, EDGE)
+
+			nowtime = self.time_text()
+			cv2.putText(clock, nowtime, (150, 650), cv2.FONT_HERSHEY_PLAIN, 3, BLACK, 3, EDGE)
+
+			cv2.imshow(WINDOW, clock)	
+			
+			key = cv2.waitKey(100)
+			if key != -1 :
+				cv2.destroyWindow(WINDOW)
+				exit()
+
+if __name__ == "__main__" :
+	app = Clock()
+	app.main()
