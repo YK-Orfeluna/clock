@@ -63,10 +63,11 @@ FONT_SIZE = 3
 FONT_BOLD = 3
 EDGE = cv2.CV_AA
 
-target = convert_second(0, 1, 0)						# タイマー時間
+target = convert_second(0, 0, 45)						# タイマー時間
 
 # ベルを鳴らす時間
-bell = [convert_second(0, 0, 15), convert_second(0, 0, 30)]
+#bell = [convert_second(0, 15, 0), convert_second(0, 20, 0), convert_second(0, 30, 0)]
+bell = [10, 20, 30]
 bell = sorted(bell)
 flag_bell = 0
 
