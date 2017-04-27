@@ -23,7 +23,7 @@ YELLOW = (0, 255, 255)
 MAGENTA = (255, 0, 255)
 CYAN = (255, 255, 0)
 
-EDGE = cv2.CV_AA
+EDGE = cv2.LINE_AA
 
 WINDOW = "Clock"
 
@@ -84,11 +84,11 @@ class Clock() :
 	def background(self) :
 		cv2.circle(self.frame, (300, 300), RAD, BLACK, -1, EDGE)
 
-		for i in xrange(60) :
+		for i in range(60) :
 			self.m = i
 			cv2.line(self.frame, self.minute(RAD_IN), self.minute(RAD_OUT), BLUE, 3, EDGE)
 		self.m = 0
-		for i in xrange(12) :
+		for i in range(12) :
 			self.h = i
 			cv2.line(self.frame, self.hour(RAD_IN), self.hour(RAD_OUT), RED, 5, EDGE)
 
